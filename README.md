@@ -2,6 +2,8 @@
 
 ![ScreenShot](https://github.com/ChrisKinsman/github-action-dashboard/blob/main/docs/images/ActionDashboardScreenShot.png?raw=true)
 
+https://github.com/ChrisKinsman/github-action-dashboard
+
 ## Helm installation
 ```
 helm repo add github-action-dashboard https://mms-gianni.github.io/github-action-dashboard-helm
