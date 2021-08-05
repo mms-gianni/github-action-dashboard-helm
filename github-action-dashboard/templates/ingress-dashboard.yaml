@@ -1,0 +1,41 @@
+{{- if .Values.dashboard.board.ingress.enabled -}}
+{{- $fullName := include "github-action-dashboard.fullname" . -}}
+{{- $svcPort := .Values.dashboard.board.service.port -}}
+{{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-dashboard
+  labels:
+    {{- include "github-action-dashboard.labels" . | nindent 4 }}
+  {{- with .Values.dashboard.board.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.dashboard.board.ingress.tls }}
+  tls:
+    {{- range .Values.dashboard.board.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    {{- range .Values.dashboard.board.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            backend:
+              serviceName: {{ $fullName }}-dashboard
+              servicePort: {{ $svcPort }}
+          {{- end }}
+    {{- end }}
+  {{- end }}

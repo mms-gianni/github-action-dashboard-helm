@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  github-action-dashboard:
+  - apiVersion: v2
+    appVersion: 1.2.1
+    created: "2021-08-05T23:17:52.484981+02:00"
+    description: A Helm chart for Kubernetes
+    digest: 51a075d817f8fc8edd784daf7c260408a50aebd60bf4b935fc9efc9bb5b6c778
+    name: github-action-dashboard
+    type: application
+    urls:
+    - https://mms-gianni.github.io/github-action-dashboard-helm/github-action-dashboard-0.0.1.tgz
+    version: 0.0.1
+generated: "2021-08-05T23:17:52.484147+02:00"

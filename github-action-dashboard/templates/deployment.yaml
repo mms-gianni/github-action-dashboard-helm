@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "github-action-dashboard.fullname" . }}
+  labels:
+    {{- include "github-action-dashboard.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "github-action-dashboard.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "github-action-dashboard.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "github-action-dashboard.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["node","index.js"]
+          env:
+            - name: GITHUB_APP_WEBHOOK_PORT
+              value: "8081"
+            - name: GITHUB_APPID
+              value: {{ .Values.github.appid | quote }}
+            - name: GITHUB_APP_PRIVATEKEY
+              value: {{ .Values.github.privatekey | quote }}
+            - name: GITHUB_APP_CLIENTID
+              value: {{ .Values.github.clientid | quote }}
+            - name: GITHUB_APP_CLIENTSECRET
+              value: {{ .Values.github.clientsecret | quote }}
+            - name: GITHUB_APP_INSTALLATIONID
+              value: {{ .Values.github.installationid | quote }}
+            {{- if .Values.github.webhookSecret  }}
+            - name: GITHUB_APP_WEBHOOK_SECRET
+              value: {{ .Values.github.webhookSecret | quote }}
+            {{- end }}
+            {{- if .Values.github.username  }}
+            - name: GITHUB_USERNAME
+              value: {{ .Values.github.username | quote }}
+            {{- end }}
+            {{- if .Values.github.org  }}
+            - name: GITHUB_ORG
+              value: {{ .Values.github.org | quote }}
+            {{- end }}
+            {{- if .Values.dashboard.debug  }}
+            - name: DEBUG
+              value: {{ .Values.dashboard.debug | quote }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: webhook
+              containerPort: 8081
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

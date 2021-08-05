@@ -1,0 +1,17 @@
+{{- if .Values.dashboard.board.ingress.enabled }}
+- Your Dashbaord is now available under following URLs:
+{{- range $host := .Values.dashboard.board.ingress.hosts }}
+  {{- range .paths }}
+  - http{{ if $.Values.dashboard.board.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{- if .Values.dashboard.webhook.ingress.enabled }}
+Your Dashbaord is now available under following URLs:
+{{- range $host := .Values.dashboard.webhook.ingress.hosts }}
+  {{- range .paths }}
+  - http{{ if $.Values.dashboard.webhook.ingress.tls }}s{{ end }}://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+{{- end }}
